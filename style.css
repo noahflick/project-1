@@ -1,4 +1,75 @@
-*{
-  color:red;
+* {
+  overflow-y: auto;
 }
+
+
+.screen {
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.section {
+  display: flex;
+  border: 1px solid darkgray;
+  border-radius: 10px;
+}
+
+#top{
+  height: 55%;
+}
+#display {
+  border: 1px solid darkgray;
+  border-radius: 10px;
+  width: 76%;
+  background: url('http://s3-media4.fl.yelpcdn.com/bphoto/3_KhycVbw8DbUJUOjXmwpA/o.jpg') no-repeat center center;
+  background-clip: content-box;
+}
+
+#status {
+  width: 26%;
+  justify-content: space-between;
+  border: 1px solid black;
+  border-radius: 10px;
+  text-align: center;
+}
+
+#status div{
+  border: 1px solid blue;
+  border-radius: 5px;
+  margin: 3px;
+}
+
+#mid {
+  justify-content: center;
+  height: 15%;
+  padding: 4px;
+}
+
+#bottom {
+  height: 30%;
+  display: flex;
+  justify-content: space-around;
+}
+
+#bottom div{
+  height: 95%;
+  width: 50%;
+  text-align: center;
+  border: 1px solid red;
+}
+
+#input {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+#input > button{
+  width: 70%;
+  margin: 5px auto;
+
+}
+
+
 
