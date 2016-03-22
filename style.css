@@ -22,7 +22,7 @@
   border: 1px solid darkgray;
   border-radius: 10px;
   width: 76%;
-  background: url('http://s3-media4.fl.yelpcdn.com/bphoto/3_KhycVbw8DbUJUOjXmwpA/o.jpg') no-repeat center center;
+  background: url('') no-repeat center center;
   background-clip: content-box;
 }
 
@@ -65,7 +65,7 @@
   justify-content: space-around;
 }
 
-#input > button{
+#input > div{
   width: 70%;
   margin: 5px auto;
 
