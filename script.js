@@ -1,20 +1,30 @@
-console.log("linked")
 
 
 function randNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+//Action Vars Defined====
+
+var defaultActions = [
+  {name: 'punch', funct: function(){console.log('punched!!')}},
+  {name: 'kick', funct: function(){console.log('kicked!!')}}
+]
+
+var runToLounge = {name: 'Run to Lounge', funct: function(){console.log('Ran to Lounge!')}}
+var runToHall = {name: 'Run to Hallway', funct: function(){console.log('Ran to Hallway!')}}
+
+
 var hero = {
   name: prompt("What is your name?"),
   hp: 100,
-  actions: ['Run', 'Fight'],
-  mood: 'in shock',
-  effects: 'none',
-  //equipped: [pen, computer, backpack, waterBottle]
 }
+///-------------------
 
-var friends = [
+
+var friends = [//all students in class
+  {name: 'Kedar', gender: 'm', equip: 'marker', specialty: 'basketball'},
+  {name: 'Hannah', gender: 'f', equip: 'ruby book', specialty: 'political conversation'},
   {name: 'Jon', gender: 'm', equip: 'nunchucks', specialty: 'banking'},
   {name: 'Noah', gender: 'm', equip: 'coffee', specialty: 'dad jokes'},
   {name: 'Max', gender: 'm', equip: 'Monster Drink', specialty: 'Spinning phat beatz'},
@@ -34,134 +44,77 @@ var friends = [
   {name: 'JoBeth', gender: 'f', equip: 'katana', specialty: 'swordplay'}
 //machete, axe, chainsaw, nunchuk, crowbar,
 ]
-
-console.log(friends.length)
+var randFriend = friends[randNum(0, friends.length-1)]
 
 for (var i = 0; i < friends.length; i++) {
   if (friends[i].name.toLowerCase() === hero.name.toLowerCase()){
-    console.log("splicing" + friends[i].name); friends.splice(i, 1);
+    console.log('You are ' + friends[i].name); friends.splice(i, 1);
   }
 }
 
-function Location(name, events, loot, nextLoc, prevLoc, img){
-  this.name = name
-  this.events = events
-  this.loot = loot
-  this.nextLoc = nextLoc
-  this.prevLoc = prevLoc
-  this.img = img
-}//Hannah: make a location index object with keys
-var class3 = new Location('Classroom 3', ['panic', 'freakout', 'faint'], 'power strip', 'lounge', 'na', 'http://s3-media4.fl.yelpcdn.com/bphoto/3_KhycVbw8DbUJUOjXmwpA/o.jpg')
-var lounge = new Location('GA Lounge', ['UX Mob', 'savior', 'leader'], 'coffee maker', 'hallway', 'Classroom 3', 'http://s3-media4.fl.yelpcdn.com/bphoto/_plEFiI6ph2EEdI3Z02ypA/o.jpg')
-/*{id: 'class2'},  possible locations
-{id: 'class1'},
-{id: 'hall'},
-{id: 'elevator'},
-{id: 'lobby'},
-{id: 'gaParking'},
-{id: 'broadway'},
-{id: 'hill'},
-{id: 'metroStop'},
-{id: 'busStop'},
-{id: 'onBus'},
-{id: 'inCar'},
-{id: 'driving'},
-{id: 'onTrain'},
-{id: 'busRide'},
-{id: 'trainRide'},
-{id: 'union'},
-{id: 'unionParking'},
-{id: 'neightborSt'},
-{id: 'yourSt'},
-{id: 'yourHome'},*/
 
-var curLocation = lounge //current location. locations should have a forward and backward linked location.
+var zoms = friends.splice(randNum(0, friends.length-1), 1) //initial zom, add'l zoms will be added.
+console.log(friends.length + ' friends remain. ', zoms.length, zoms.length == 1 ? 'is a zombie.' : 'are zombies.')
 
+var curZom = zoms[0]
+var victims = friends.splice(randNum(0, friends.length-1), 1) //initial zom, add'l zoms will be added.
+console.log(friends.length + ' friends remain. ', victims.length, victims.length == 1 ? 'is under attack.' : 'are under attack.')
 
-var zoms = friends.splice(randNum(0, friends.length-1), 1) // any friends that have been bitten, starts with zoms[0]
-
-var status
-var inventory
-var party
-var objective
-var equipped
-
-var screen
-var journalScreen
-var log
-
-
-
-
-
-var events = [
-{id: 'zombie'},
-{id: 'friendBitten'},
-{id: 'meet'}
-]
-
-var inCombat = false
-var inConvo = false
-
-function setup(){
-  //ask name
-  //ask address
-  //ask computer type
-  //ask apt? house? condo?
-  //
-}
-
-function initScreen(){
-  $('#status h2').html(hero.name)
-  $('#hp').html('HP: ' + hero.hp)
-  $('#effects').html('Effects: ' + hero.effects)
-  $('#mood').html('Mood: ' + hero.mood)
-  $('#display').css('background', 'url(' + curLocation.img + ')')
-}
-
-initScreen()
-
+var helpVictim = {name: 'Help ' + victims[0].name, funct: function(){console.log('Helped', victims[0].name)}}
 
 
 function update(text){
   $('#prompt').html(text)
 }
 
-function introText(){
-  update("You are working on bugs... you look up as a decaying WDI 8 student awkwardly ambles into the room and bites " + zoms[0].name + " on the neck. ")
+function introScene(){
+  var randFriend1 = randFriend
+  update("After a frustrating morning, you return from lunch and attempt to fix some bugs.... just as " + randFriend1.name + " starts to explain the finer points of  \"" + randFriend1.specialty + "\", " + zoms[0].name + " appears looking very sickly and awkwardly ambles into the room. Out of nowhere, " + zoms[0].name + " bites " + victims[0].name + " on the neck. ")
+
 }
 
-introText()
+function Location(name, img, actions){//location constructor
+  this.name = name
+  this.img = img
+  this.actions = actions
+}//Hannah: make a location index object with keys
+var class3 = new Location(
+    'Classroom 3',
+    'http://s3-media4.fl.yelpcdn.com/bphoto/3_KhycVbw8DbUJUOjXmwpA/o.jpg',
+    [
+      runToLounge, runToHall, helpVictim
+    ]
+  )
+
+var lounge = new Location('GA Lounge', 'http://s3-media4.fl.yelpcdn.com/bphoto/_plEFiI6ph2EEdI3Z02ypA/o.jpg')
+
+var curLocation = class3//current location. locations should have a forward and backward linked location.
+function curActions(){
+  for (var i = 0; i < defaultActions.length; i++) {
+      $("<div>" + defaultActions[i].name + "</div>").appendTo('#input')
+    }
+      for (var i = 0; i < curLocation.actions.length; i++) {
+      $("<div>" + curLocation.actions[i].name + "</div>").appendTo('#input')
+    }
+  }
+
+
+introScene()
+
+function initScreen(){
+  $('#status h2').html(hero.name)
+  $('#hp').html('HP: ' + hero.hp)
+  $('#display').css('background-image', 'url(' + curLocation.img + ')')
+  curActions()
+}
+
+initScreen()
+
+
+
 
 /*function changeLoc(){
   $('#display').css("background-image", "url('http://s3-media4.fl.yelpcdn.com/bphoto/_plEFiI6ph2EEdI3Z02ypA/o.jpg')")
 }*/
 
-var actions = [ 'run to lounge', 'run to hallway', 'help ' + zoms[0].name, 'cry'
-]
 
-function makeActionButtons(arr){
-  for (var i = 0; i < arr.length; i++) {
-    $("<div>" + arr[i] + "</div>").appendTo('#input')
-  }
-
-}
-
-makeActionButtons(actions)
-
-
-
-//select computer
-//select best friend
-//sselect
-
-//thoughts:
-/*
-Classmates/teachers as party
-story based on if zombie apocalypse happened here.
-
-2 versions: zombie apocalypse and coding challenges.
-
-
-
-*/
