@@ -42,7 +42,6 @@ for (var i = 0; i < friends.length; i++) { //depend: friends, hero
   }
 }
 
-
 var zoms = friends.splice(randNum(0, friends.length-1), 1) //initial zom, add'l zoms will be added.
 console.log(friends.length + ' friends remain. ', zoms.length, zoms.length == 1 ? 'is a zombie.' : 'are zombies.')
 
@@ -95,27 +94,30 @@ console.log(friends.length + ' friends remain. ', victims.length, victims.length
 //Define Character Actions====
 
 var defaultActions = [
-  {name: 'punch ' + enemy.name,
+  {name: 'attack ' + enemy.name,
     funct: function(){
-      enemy.hp -= 10
-      $('.attack').toggle(50).html('punched ' + enemy.name)
+      var dmg = randNum(5,15)
+      enemy.hp -= dmg
+      $('.attack').toggle(50).html('hit ' + enemy.name)
       setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
-      setTimeout(function(){$('.effect').toggle(500).html('Zombie '+enemy.name + '-10 hp!')}, 1000)
+      setTimeout(function(){$('.effect').toggle(500).html(-dmg + 'hp!')}, 1000)
       setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
-      update(punchText[randNum(0,punchText.length-1)])
+      update(attackText[randNum(0,attackText.length-1)])
+      showHP()
     }
   },
-  {name: 'kick ' + enemy.name,
-    funct: function(){
-      $('.attack').toggle(50).html('kicked ' + enemy.name)
-      setTimeout(function(){$('.attack').fadeOut(1000)}, 1000)
-      console.log('kicked!!')
-    }
-  }
+  // {name: 'kick ' + enemy.name,
+  //   funct: function(){
+  //     $('.attack').toggle(50).html('kicked ' + enemy.name)
+  //     setTimeout(function(){$('.attack').fadeOut(1000)}, 1000)
+  //     console.log('kicked!!')
+  //   }
+  // }
 ]
 
 $('.attack').hide()
 $('.effect').hide()
+$('#displayMessage').hide()
 
 //Define Location specific action objects===
 var runToLounge = {
@@ -141,7 +143,20 @@ var runToElevator = {
 var helpVictim0 = {
   name: 'Help ' + victims[0].name,
   funct: function(){
-    console.log('Helped', victims[0].name)
+    var rolled = roll()
+    console.log('victimRoll = ' + rolled)
+    // if(rolled > 50){
+      var dmg = randNum(5,15)
+      enemy.hp -= dmg
+      showHP()
+      $('.attack').toggle(50).html(enemy.name +' stumbles!')
+      setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
+      setTimeout(function(){$('.effect').toggle(500).html(-dmg + 'hp!')}, 1000)
+      setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
+      update(victim0Text[randNum(0,victim0Text.length-1)])
+      curLocation.actions = curLocation.actions.filter(function (action) { return action.name != 'Help ' + victims[0].name});
+      curActions()
+    // }
   }
 }
 
@@ -152,10 +167,8 @@ var lookInClass1 = {
   }
 }
 
-
-
 function update(text){
-  $('#prompt').html(text)
+  $('#prompt').html(text + ' What do you do?')
 }
 
 function introScene(){
@@ -198,12 +211,14 @@ function rollCall(){
   $("<div><h3>Survivors</h3>" + survivors() + "</div>").appendTo('#rollcall')
   $("<div><h3>Zombies</h3>" + zombies() + "</div>").appendTo('#rollcall')
 }
-$('#status h2').html(hero.name)
+$('#heroName').html(hero.name)
 
 function showLocation() {$('#displayBox').css('background-image', 'url(' + curLocation.img + ')')
 }
 function showHP(){
   $('#hp').html('HP: ' + hero.hp)
+  $('#enemyHP').html('HP: ' + enemy.hp)
+  $('#enemyName').html(enemy.name).css('color', 'red')
 }
 
 function initScreen(){
@@ -215,8 +230,6 @@ function initScreen(){
 
 initScreen()
 
-
-
 function buttonStyle(){$('.select').click(function() {
     $(this).addClass('clicked')
   }).mouseleave(function() {
@@ -225,16 +238,26 @@ function buttonStyle(){$('.select').click(function() {
 }
 buttonStyle()
 
-var punchText = [
+var attackText = [
   'You punch ' + enemy.name + ' in the mouth. this causes ' + randFriend().name + ' to scream in horror!',
-  'You try to punch ' + enemy.name + ' but you miss and ' + enemy.name + ' charges at you. Luckily ' + randFriend().name + ' quickly finishes a git commit and hits ' + enemy.name + '!',
+  'You take a swing at ' + enemy.name + ', but you miss and ' + enemy.name + ' charges at you. Luckily ' + randFriend().name + ' quickly finishes a git commit and kicks ' + enemy.name + '!',
   'You go to punch ' + enemy.name + ', but you miss. ' + enemy.name + ' groans and claws at ' + randFriend().name + ', who smashes a MacBook Air over ' + enemy.name + '\'s already rotting head.'
   ]
+
+var victim0Text = [
+    'You tear ' + victims[victims.length-1].name + ' away from ' + enemy.name + '. ' + victims[victims.length-1].name + ' kicks ' + enemy.name + ', who stumbles into the wall erasing ' + randFriend().name + '\'s complicated recursion diagram.',
+    'As you pull ' + enemy.name + ' off of ' + victims[victims.length-1].name + ', ' + randFriend().name + ' throws a backpack across the room, sending ' + enemy.name + ' stumbling over the lectern.'
+]
+
 function randFriend() {
  return friends[randNum(0, friends.length-1)]
 }
 
 function hideScreen(){$('#playscreen').hide()}
+function promptPlayer(){$('#displayMessage').show().html('What do you do??')}
+// function(clearPrompt){
+
+// }
 
 function newLoc(){
     // checkLoc
