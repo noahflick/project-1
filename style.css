@@ -3,6 +3,13 @@
   font-family: Neucha;
 }
 
+h3 {
+  margin: 5px auto;
+}
+
+h1, h2, h3, h4 {
+  font-family: Creepster;
+}
 
 .screen {
   height: 600px;
@@ -19,17 +26,20 @@
 #top{
   height: 55%;
 }
-#display {
+#displayBox {
   border: 1px solid darkgray;
   border-radius: 10px;
   width: 76%;
   background: url('') no-repeat center center;
   background-clip: content-box;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+
 }
 
 #status {
   width: 26%;
-  justify-content: space-between;
   border: 1px solid black;
   border-radius: 10px;
   text-align: center;
@@ -44,7 +54,7 @@
 #mid {
   justify-content: center;
   height: 15%;
-  padding: 4px;
+  padding: 4px 10px;
 }
 
 #bottom {
@@ -54,10 +64,10 @@
 }
 
 #bottom div{
-  height: 95%;
   width: 50%;
   text-align: center;
-  border: 1px solid red;
+  border: 1px solid gray;
+  padding: 4px auto;
 }
 
 #input {
@@ -70,8 +80,49 @@
   width: 70%;
   margin: 5px auto;
   border-radius: 5px;
-
 }
+
+#rollcall {
+  display: flex;
+}
+
+
+.select:hover{
+  color:red;
+}
+
+.clicked{
+  background-color: gray;
+}
+
+.attack {
+  font-size: 50px;
+  color: red;
+}
+
+.effect {
+  font-size: 50px;
+  color: brown;
+}
+
+
+#hp {
+  display: flex;
+}
+
+#hpbar {
+  width: 50%;
+  height: 100%;
+  background-color: green;
+}
+
+#hpneg{
+  width: 50%;
+  height: 100%;
+  background-color: red;
+}
+
+
 
 
 
