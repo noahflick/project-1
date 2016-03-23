@@ -8,6 +8,10 @@ function roll() {
   return randNum(0, 100)
 }
 
+$('#top').hide()
+$('#bottom').hide()
+
+
 var hero = {
   name: prompt("Welcome to the Apocalypse. What is your name?"),
   hp: 100,
@@ -16,23 +20,23 @@ var hero = {
 var friends = [//all students in class --REFACTOR
   {name: 'Kedar', gender: 'm', equip: 'marker', specialty: 'basketball'},
   {name: 'Hannah', gender: 'f', equip: 'ruby book', specialty: 'political conversation'},
-  {name: 'Jon', gender: 'm', equip: 'nunchucks', specialty: 'banking'},
-  {name: 'Noah', gender: 'm', equip: 'coffee', specialty: 'dad jokes'},
+  {name: 'Jon', gender: 'm', equip: 'nunchuk', specialty: 'banking'},
+  {name: 'Noah', gender: 'm', equip: 'coffee cup', specialty: 'dad jokes'},
   {name: 'Max', gender: 'm', equip: 'Monster Drink', specialty: 'Spinning phat beatz'},
   {name: 'Marcos', gender: 'm', equip: 'Spongebob doll', specialty: 'getting money'},
-  {name: 'Angie', gender: 'f', equip: '', specialty: 'making things pretty'},
-  {name: 'Brigette', gender: 'f', equip: '', specialty: 'eating tacos'},
-  {name: 'Andrew', gender: 'm', equip: 'Beats headphones', specialty: 'cyber security'},
+  {name: 'Angie', gender: 'f', equip: 'purse', specialty: 'making things pretty'},
+  {name: 'Brigette', gender: 'f', equip: 'taco', specialty: 'eating tacos'},
+  {name: 'Andrew', gender: 'm', equip: 'pair of Beats headphones', specialty: 'cyber security'},
   {name: 'A.J.', gender: 'm', equip: 'marker', specialty: 'laughter'},
-  {name: 'Carlos A.', gender: 'm', equip: 'smokes', specialty: 'futbol'},
+  {name: 'Carlos A.', gender: 'm', equip: 'pack of smokes', specialty: 'futbol'},
   {name: 'Arvin', gender: 'm', equip: 'pillow', specialty: 'MMA'},
-  {name: 'Victor', gender: 'm', equip: 'portal gun', specialty: 'getting Timey-Wimey'},
+  {name: 'Victor', gender: 'm', equip: 'portal gun', specialty: 'the fifth doctor'},
   {name: 'Trevor', gender: 'm', equip: 'Richard Feynman biography', specialty: 'theoretical physics'},
-  {name: 'Joseph', gender: 'm', equip: 'cookies', specialty: 'DIY stuff'},
-  {name: 'Martin', gender: 'm', equip: '', specialty: 'bein all cool'},
-  {name: 'Carlos B.', gender: 'm', equip: '', specialty: 'acting'},
-  {name: 'Timmy', gender: 'm', equip: 'vape', specialty: 'violin performance'},
-  {name: 'JoBeth', gender: 'f', equip: 'katana', specialty: 'swordplay'}
+  {name: 'Joseph', gender: 'm', equip: 'container of cookies', specialty: 'DIY stuff'},
+  {name: 'Martin', gender: 'm', equip: 'javascript book', specialty: 'blackjack'},
+  {name: 'Carlos B.', gender: 'm', equip: 'pair of sunglasses', specialty: 'acting'},
+  {name: 'Timmy', gender: 'm', equip: 'vaporizer', specialty: 'violin performance'},
+  {name: 'JoBeth', gender: 'f', equip: 'colorful MacBook', specialty: 'Filipino culture'}
 //machete, axe, chainsaw, nunchuk, crowbar,
 ]
 
@@ -128,6 +132,7 @@ $('.attack').hide()
 $('.effect').hide()
 $('#displayMessage').hide()
 
+
 //Define Location specific action objects===
 var runToLounge = {
   name: 'Run to Lounge',
@@ -190,11 +195,25 @@ var lookInClass1 = {
 
 function update(text){
   $('#prompt').html(text + '<br/> Now what do you want to do?')
+  $('#next').show()
+  $('#next').on('click', initScreen)
+}
+function introUpdate(text){
+  $('#top').show()
+  $('#displayBox').show()
+  showLocation
+  $('#status').hide()
+  $('#prompt').html(text)
+  $('#next').show()
+  $('#next').on('click', initScreen)
+
 }
 
 function introScene(){
+  $('#prompt').show()
   var randFriend1 = randFriend()
-  update("After a frustrating morning, you return from lunch and attempt to fix some bugs.... just as " + randFriend1.name + " starts to explain the finer points of  \"" + randFriend1.specialty + "\", " + zoms[0].name + " appears looking very sickly and awkwardly ambles into the room. Out of nowhere, " + zoms[0].name + " bites " + victims[0].name + " on the neck. ")
+  introUpdate("After a frustrating morning, you return from lunch and attempt to fix some bugs.... just as " + randFriend1.name + " starts to explain the finer points of  \"" + randFriend1.specialty + "\", " + zoms[0].name + " appears looking very sickly and awkwardly ambles into the room. Out of nowhere, " + zoms[0].name + " bites " + victims[0].name + " on the neck. ")
+
 }
 
 introScene()
@@ -208,12 +227,12 @@ function Location(name, img, actions){//location constructor
 var class3 = new Location(
   'Classroom 3',
   'http://s3-media4.fl.yelpcdn.com/bphoto/3_KhycVbw8DbUJUOjXmwpA/o.jpg',
-  [runToLounge, runToHall, helpVictim0]
+  [/*runToLounge, runToHall, */helpVictim0]
 )
 var lounge = new Location(
   'GA Lounge',
   'http://s3-media4.fl.yelpcdn.com/bphoto/_plEFiI6ph2EEdI3Z02ypA/o.jpg',
-  [lookInClass1, runToHall]
+  [/*lookInClass1, runToHall*/]
 )
 
 var curLocation = class3//current location. locations should have a forward and backward linked location.
@@ -229,8 +248,8 @@ function curActions(){
 }
 
 function rollCall(){
-  $("<div><h3>Survivors</h3>" + survivors() + "</div>").appendTo('#rollcall')
-  $("<div><h3>Zombies</h3>" + zombies() + "</div>").appendTo('#rollcall')
+  $('#survivors').html(survivors())
+  $('#zombies').html(zombies())
 }
 $('#heroName').html(hero.name)
 
@@ -243,13 +262,15 @@ function showHP(){
 }
 
 function initScreen(){
+  $('#top, #bottom, #status').show()
   showLocation()
   showHP()
   curActions()
   rollCall()
+  $('#next').hide()
 }
 
-initScreen()
+// initScreen()
 
 function buttonStyle(){$('.select').click(function() {
     $(this).addClass('clicked')
@@ -273,10 +294,6 @@ var victim0Text = [
 function randFriend() {
  return friends[randNum(0, friends.length-1)]
 }
-
-function hideScreen(){$('#playscreen').hide()}
-function promptPlayer(){$('#displayMessage').show().html('What do you do??')}
-// function(clearPrompt){
 
 // }
 
