@@ -97,12 +97,17 @@ h1, h2, h3, h4 {
 
 .attack {
   font-size: 50px;
-  color: red;
+  color: green;
 }
 
 .effect {
   font-size: 50px;
   color: brown;
+}
+
+.damage {
+  font-size: 50;
+  color: red;
 }
 
 

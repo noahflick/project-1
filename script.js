@@ -4,12 +4,16 @@ function randNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function roll() {
+  return randNum(0, 100)
+}
+
 var hero = {
-  name: prompt("What is your name?"),
+  name: prompt("Welcome to the Apocalypse. What is your name?"),
   hp: 100,
 }
 
-var friends = [//all students in class
+var friends = [//all students in class --REFACTOR
   {name: 'Kedar', gender: 'm', equip: 'marker', specialty: 'basketball'},
   {name: 'Hannah', gender: 'f', equip: 'ruby book', specialty: 'political conversation'},
   {name: 'Jon', gender: 'm', equip: 'nunchucks', specialty: 'banking'},
@@ -32,7 +36,7 @@ var friends = [//all students in class
 //machete, axe, chainsaw, nunchuk, crowbar,
 ]
 
-for (var i = 0; i < friends.length; i++) {
+for (var i = 0; i < friends.length; i++) { //depend: friends, hero
   if (friends[i].name.toLowerCase() === hero.name.toLowerCase()){
     console.log('You are ' + friends[i].name); friends.splice(i, 1);
   }
@@ -44,6 +48,30 @@ console.log(friends.length + ' friends remain. ', zoms.length, zoms.length == 1 
 
 var turn = 1
 var enemy = zoms[turn-1]
+enemy.name = 'Zombie ' + enemy.name
+enemy.hp = 30
+enemy.actions = {}
+enemy.actions.bite = {
+  name : 'bite',
+  funct : function(){
+    var rolled = roll()
+    console.log(enemy.name + ' rolled ' + rolled)
+    if(rolled > 90){
+      hero.turned = true
+      update('you have been bitten by ' + enemy.name + '. You have moments before you will turn into a zombie.')
+    } else if (rolled < 30){
+    hero.hp -= 10
+    update(enemy.name + 'bites at you. you aren\'t bitten but stumble over ' + randFriend().name + ' and hurt yourself.' )
+    showHP()
+    } else {
+      update(enemy.name + ' lunges, trying to bite you, but ' + randFriend().name + ' throws a chair at ' + enemy.name)
+      enemy.hp -= 10
+    }
+  }
+}
+enemy.actions.claw = function(){}
+enemy.actions.grab = function(){}
+
 var victims = friends.splice(randNum(0, friends.length-1), 1)
 
 function survivors(){
@@ -67,19 +95,19 @@ console.log(friends.length + ' friends remain. ', victims.length, victims.length
 //Define Character Actions====
 
 var defaultActions = [
-  {name: 'punch zombie ' + enemy.name,
+  {name: 'punch ' + enemy.name,
     funct: function(){
       enemy.hp -= 10
-      $('.attack').toggle(50).html('punched zombie ' + enemy.name)
+      $('.attack').toggle(50).html('punched ' + enemy.name)
       setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
       setTimeout(function(){$('.effect').toggle(500).html('Zombie '+enemy.name + '-10 hp!')}, 1000)
       setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
       update(punchText[randNum(0,punchText.length-1)])
     }
   },
-  {name: 'kick zombie ' + enemy.name,
+  {name: 'kick ' + enemy.name,
     funct: function(){
-      $('.attack').toggle(50).html('kicked zombie ' + enemy.name)
+      $('.attack').toggle(50).html('kicked ' + enemy.name)
       setTimeout(function(){$('.attack').fadeOut(1000)}, 1000)
       console.log('kicked!!')
     }
@@ -154,7 +182,7 @@ var lounge = new Location(
   [lookInClass1, runToHall]
 )
 
-var curLocation = lounge//current location. locations should have a forward and backward linked location.
+var curLocation = class3//current location. locations should have a forward and backward linked location.
 
 function curActions(){
   $('#input').empty()
@@ -170,19 +198,23 @@ function rollCall(){
   $("<div><h3>Survivors</h3>" + survivors() + "</div>").appendTo('#rollcall')
   $("<div><h3>Zombies</h3>" + zombies() + "</div>").appendTo('#rollcall')
 }
+$('#status h2').html(hero.name)
 
+function showLocation() {$('#displayBox').css('background-image', 'url(' + curLocation.img + ')')
+}
+function showHP(){
+  $('#hp').html('HP: ' + hero.hp)
+}
 
 function initScreen(){
-  $('#status h2').html(hero.name)
-  $('#hp').html('HP: ' + hero.hp)
-
-  $('#displayBox').css('background-image', 'url(' + curLocation.img + ')')
+  showLocation()
+  showHP()
   curActions()
   rollCall()
 }
 
 initScreen()
-enemy.hp = 30
+
 
 
 function buttonStyle(){$('.select').click(function() {
@@ -194,16 +226,41 @@ function buttonStyle(){$('.select').click(function() {
 buttonStyle()
 
 var punchText = [
-  'You punch zombie ' + enemy.name + ' in the mouth. this causes ' + randFriend().name + ' to scream in horror!',
-  'You try to punch zombie ' + enemy.name + ' but you miss and zombie ' + enemy.name + ' charges at you. Luckily ' + randFriend().name + ' quickly finishes a git commit and hits zombie ' + enemy.name + '!',
+  'You punch ' + enemy.name + ' in the mouth. this causes ' + randFriend().name + ' to scream in horror!',
+  'You try to punch ' + enemy.name + ' but you miss and ' + enemy.name + ' charges at you. Luckily ' + randFriend().name + ' quickly finishes a git commit and hits ' + enemy.name + '!',
   'You go to punch ' + enemy.name + ', but you miss. ' + enemy.name + ' groans and claws at ' + randFriend().name + ', who smashes a MacBook Air over ' + enemy.name + '\'s already rotting head.'
   ]
 function randFriend() {
  return friends[randNum(0, friends.length-1)]
 }
 
+function hideScreen(){$('#playscreen').hide()}
 
+function newLoc(){
+    // checkLoc
+    // checkHero
+    // pickEnemy?
+    // pickVictim?
+    // rollCall()
+    // initScreen(loc actions)
+    // textintro
+    //  choice- escape to next location or fight?
+    // rollcall again
+    // loop{
+    //   playerturn
+    //     prompt
+    //     actions
+    //     summary/result
+    //     check win/lose
+    //   enemyturn
+    //     update/result
+    //     check win/lose
+    // }
+    // lose exit
+    // win -> draw choose next location
+    // next location generates battle
 
+}
 
 /*function changeLoc(){
   $('#displayBox').css("background-image", "url('http://s3-media4.fl.yelpcdn.com/bphoto/_plEFiI6ph2EEdI3Z02ypA/o.jpg')")
