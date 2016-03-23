@@ -31,7 +31,7 @@ var friends = [//all students in class --REFACTOR
   {name: 'Joseph', gender: 'm', equip: 'cookies', specialty: 'DIY stuff'},
   {name: 'Martin', gender: 'm', equip: '', specialty: 'bein all cool'},
   {name: 'Carlos B.', gender: 'm', equip: '', specialty: 'acting'},
-  {name: 'Timmy', gender: 'm', equip: 'vape', specialty: 'C++'},
+  {name: 'Timmy', gender: 'm', equip: 'vape', specialty: 'violin performance'},
   {name: 'JoBeth', gender: 'f', equip: 'katana', specialty: 'swordplay'}
 //machete, axe, chainsaw, nunchuk, crowbar,
 ]
@@ -59,12 +59,21 @@ enemy.actions.bite = {
       hero.turned = true
       update('you have been bitten by ' + enemy.name + '. You have moments before you will turn into a zombie.')
     } else if (rolled < 30){
-    hero.hp -= 10
-    update(enemy.name + 'bites at you. you aren\'t bitten but stumble over ' + randFriend().name + ' and hurt yourself.' )
-    showHP()
+      hero.hp -= 10
+      update(enemy.name + 'bites at you. you aren\'t bitten but stumble over ' + randFriend().name + ' and hurt yourself.' )
+      $('.attack').toggle(50).html('You stumble over')
+        setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
+        setTimeout(function(){$('.effect').toggle(500).html(-10 + 'hp!')}, 1000)
+        setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
+      showHP()
     } else {
       update(enemy.name + ' lunges, trying to bite you, but ' + randFriend().name + ' throws a chair at ' + enemy.name)
+      $('.attack').toggle(50).html('Chair hits ' + enemy.name)
+      setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
+      setTimeout(function(){$('.effect').toggle(500).html(-10 + 'hp!')}, 1000)
+      setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
       enemy.hp -= 10
+      showHP()
     }
   }
 }
@@ -145,7 +154,7 @@ var helpVictim0 = {
   funct: function(){
     var rolled = roll()
     console.log('victimRoll = ' + rolled)
-    // if(rolled > 50){
+    if(rolled > 100){
       var dmg = randNum(5,15)
       enemy.hp -= dmg
       showHP()
@@ -156,7 +165,19 @@ var helpVictim0 = {
       update(victim0Text[randNum(0,victim0Text.length-1)])
       curLocation.actions = curLocation.actions.filter(function (action) { return action.name != 'Help ' + victims[0].name});
       curActions()
-    // }
+      victimSaved = true
+    } else {
+      update('You try to rescue ' + victims[0].name + ', but ' + enemy.name + ' flails wildly, throwing you and ' + randFriend().name + ' back. You watch helplessly as ' + enemy.name + ' kills '+victims[0].name+'.')
+      $('.attack').toggle(50).html(victims[0].name +' is Dead!')
+      setTimeout(function(){$('.attack').fadeOut(1000)}, 5000)
+      curLocation.actions = curLocation.actions.filter(function (action) { return action.name != 'Help ' + victims[0].name});
+      curActions()
+      console.log('victims = ' + victims)
+      victims.pop()
+      console.log('victims = '+victims)
+
+
+    }
   }
 }
 
@@ -168,7 +189,7 @@ var lookInClass1 = {
 }
 
 function update(text){
-  $('#prompt').html(text + ' What do you do?')
+  $('#prompt').html(text + '<br/> Now what do you want to do?')
 }
 
 function introScene(){
