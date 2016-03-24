@@ -18,12 +18,16 @@ function focusText(){//hide ui elements
 }
 focusText()
 
+$('#whole').hide()
+
 // choose name
 var hero = {
   name: prompt("What is your name?"),
   hp: 100,
+  bitten: false
 }
 
+$('#whole').fadeIn(3000)
 
 // //intro
 var introText = "Intro text to game."
@@ -92,18 +96,145 @@ var friends = [
 //machete, axe, chainsaw, nunchuk, crowbar,
 ]
   //   friends
+  function randFriend() {
+ return friends[randNum(0, friends.length-1)]
+}
   //remove hero from friends array
 for (var i = 0; i < friends.length; i++) {
   if (friends[i].name.toLowerCase() === hero.name.toLowerCase()){
     console.log('You are ' + friends[i].name); friends.splice(i, 1);
   }
 }
-  //  choose zoms/enemy
-  //   victims
-  //   roll call
-  //   action functions and results
-  //   win condition functions and results
+//  choose zoms/enemy
+var zoms = friends.splice(randNum(0, friends.length-1), 1)
+var enemy = zoms[zoms.length-1]
+enemy.name = 'Zombie ' + enemy.name
+enemy.hp = 30
 
+//   victims
+var victims = friends.splice(randNum(0, friends.length-1), 1)
+victim = victims[0]
+
+//   roll call
+function survivors(){
+  var list = ""
+  for (var i = 0; i < friends.length; i++) {
+    list += friends[i].name + (i == friends.length - 1 ? "" : ",  ")
+  }
+  return list
+}
+
+function zombies(){
+  var list = ""
+  for (var i = 0; i < zoms.length; i++) {
+    list += zoms[i].name + (i == zoms.length - 1 ? "" : ", ")
+  }
+  return list
+}
+  //define feedbacks/ effects
+function posFeedback(text){
+  $('.attack').css('color', 'green')
+  $('.attack').toggle(50).html(text)
+  setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
+}
+function negFeedback(text){
+  $('.attack').css('color', 'red')
+  $('.attack').toggle(50).html(text)
+  setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
+}
+
+function subFeedback(text){
+  setTimeout(function(){$('.effect').toggle(500).html(text)}, 1000)
+  setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
+}
+
+function playerHit(num){
+  hero.hp =- num
+}
+
+function enemyHit(num){
+  enemy.hp =- num
+}
+  //   action functions and results
+
+var attackText = [
+  'You punch ' + enemy.name + ' in the mouth. this causes ' + randFriend().name + ' to scream in horror!',
+  'You take a swing at ' + enemy.name + ', but you miss and ' + enemy.name + ' charges at you. Luckily ' + randFriend().name + ' quickly finishes a git commit and kicks ' + enemy.name + '!',
+  'You go to punch ' + enemy.name + ', but you miss. ' + enemy.name + ' groans and claws at ' + randFriend().name + ', who smashes a MacBook Air over ' + enemy.name + '\'s already rotting head.'
+  ]
+
+var attack = {
+  name: 'attack ' + enemy.name,
+  text: attackText[randNum(0, attackText.length-1)],
+  funct: function(){
+    var dmg = randNum(5,15)
+    enemy.hp -= dmg
+    posFeedback('hit ' + enemy.name)
+    subFeedback(-dmg)
+  },
+}
+
+// select bite version (hit, fail, or miss)
+function biteRoll(){
+  rolled = roll()
+  if(rolled > 90)
+    return 0
+  else if (rolled < 30)
+    return 1
+  else
+    return 2
+}
+
+var biteHit = {
+  name: 'bite',
+  text: 'you have been bitten by ' + enemy.name + '. You have moments before you will turn into a zombie.',
+  funct: function(){
+    var dmg = randNum(5,15)
+    hero.hp -= dmg
+    negFeedback(enemy.name + 'bites you!')
+    subFeedback(-dmg)
+  }
+}
+
+var biteFail = {
+  name: 'bite',
+  text: enemy.name + 'bites at you. you aren\'t bitten but stumble over ' + randFriend().name + ' and hurt yourself.',
+  funct: function(){
+    var dmg = randNum(5,15)
+    hero.hp -= dmg
+    negFeedback('You Stumble')
+    subFeedback(-dmg)
+  }
+}
+
+var biteMiss = {
+  name: 'bite',
+  text: enemy.name + ' lunges, trying to bite you, but ' + randFriend().name + ' throws a chair at ' + enemy.name,
+  funct: function(){
+      posFeedback(enemy.name + ' misses.')
+      subFeedback('You got lucky!')
+  }
+}
+
+var biteVersions = [biteHit, biteFail, biteMiss]
+var bite = biteVersions[biteRoll()]
+
+
+
+  //   win condition functions and results
+function loseCheck(){
+  if(hero.hp < 1){
+    introUpdate(enemy.name + ' has Killed you. You are dead.')
+    $('#next').html('play again?')
+  }
+}
+function winCheck(){
+  if(enemy.hp < 1){
+    update(enemy.name + '\'s head explodes.')
+    $('#enemyName').fadeOut(4000)
+    $('#enemyHP').fadeOut(4000)
+  }
+}
 
   // on continue button click:
 
