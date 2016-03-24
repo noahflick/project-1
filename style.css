@@ -32,6 +32,7 @@ h1, h2, h3, h4 {
   width: 76%;
   background: url('') no-repeat center center;
   background-clip: content-box;
+  background-size: 100% auto;
   justify-content: center;
   display: flex;
   flex-direction: column;

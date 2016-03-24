@@ -230,16 +230,16 @@ function Location(name, img, actions){//location constructor
 
 var class3 = new Location(
   'Classroom 3',
-  'http://s3-media4.fl.yelpcdn.com/bphoto/3_KhycVbw8DbUJUOjXmwpA/o.jpg',
+  'assets/class3.jpg',
   [/*runToLounge, runToHall, */helpVictim0]
 )
 var lounge = new Location(
   'GA Lounge',
-  'http://s3-media4.fl.yelpcdn.com/bphoto/_plEFiI6ph2EEdI3Z02ypA/o.jpg',
+  'assets/lounge.jpg',
   [/*lookInClass1, runToHall*/]
 )
 
-var curLocation = class3//current location. locations should have a forward and backward linked location.
+var curLocation = lounge//current location. locations should have a forward and backward linked location.
 
 function curActions(){
   $('#input').empty()
