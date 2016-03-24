@@ -17,7 +17,7 @@ var hero = {
   hp: 100,
 }
 
-var friends = [//all students in class --REFACTOR
+var friends = [
   {name: 'Kedar', gender: 'm', equip: 'marker', specialty: 'basketball'},
   {name: 'Hannah', gender: 'f', equip: 'ruby book', specialty: 'political conversation'},
   {name: 'Jon', gender: 'm', equip: 'nunchuk', specialty: 'banking'},
@@ -180,8 +180,6 @@ var helpVictim0 = {
       console.log('victims = ' + victims)
       victims.pop()
       console.log('victims = '+victims)
-
-
     }
   }
 }
@@ -195,28 +193,34 @@ var lookInClass1 = {
 
 function update(text){
   $('#prompt').html(text + '<br/> Now what do you want to do?')
-  $('#next').show()
-  $('#next').on('click', initScreen)
+  $('#next').hide()
 }
 function introUpdate(text){
+  $('#playscreen').hide()
   $('#top').show()
   $('#displayBox').show()
   showLocation
   $('#status').hide()
-  $('#prompt').html(text)
+  $('#textUpdate').html(text)
+  $('#textUpdate').append($('#next'))
   $('#next').show()
-  $('#next').on('click', initScreen)
+  curHandler = initScreen
 
 }
 
+var curHandler;
+
+$('#next').on('click', function(){
+  curHandler()
+})
+
+var randFriend1 = randFriend()
+var introText = "After a frustrating morning, you return from lunch and attempt to fix some bugs.... just as " + randFriend1.name + " starts to explain the finer points of  \"" + randFriend1.specialty + "\", " + zoms[0].name + " appears looking very sickly and awkwardly ambles into the room. Out of nowhere, " + zoms[0].name + " bites " + victims[0].name + " on the neck. "
 function introScene(){
   $('#prompt').show()
-  var randFriend1 = randFriend()
-  introUpdate("After a frustrating morning, you return from lunch and attempt to fix some bugs.... just as " + randFriend1.name + " starts to explain the finer points of  \"" + randFriend1.specialty + "\", " + zoms[0].name + " appears looking very sickly and awkwardly ambles into the room. Out of nowhere, " + zoms[0].name + " bites " + victims[0].name + " on the neck. ")
+  introUpdate(introText)
 
 }
-
-introScene()
 
 function Location(name, img, actions){//location constructor
   this.name = name
@@ -245,6 +249,10 @@ function curActions(){
   for (var i = 0; i < curLocation.actions.length; i++) {
     $("<div>" + curLocation.actions[i].name + "</div>").appendTo('#input').on('click', curLocation.actions[i].funct).removeClass().addClass('select')
   }
+  $('#input div').on('click', function(){
+    loseCheck()
+    winCheck()
+  })
 }
 
 function rollCall(){
@@ -262,13 +270,18 @@ function showHP(){
 }
 
 function initScreen(){
+  $('#playscreen').show()
+  $('#prompt').html(introText)
   $('#top, #bottom, #status').show()
   showLocation()
   showHP()
   curActions()
   rollCall()
   $('#next').hide()
+  $('#textUpdate').hide()
 }
+
+
 
 // initScreen()
 
@@ -295,7 +308,30 @@ function randFriend() {
  return friends[randNum(0, friends.length-1)]
 }
 
+introScene()
+
+function loseCheck(){
+  if(hero.hp < 1){
+    introUpdate(enemy.name + ' has Killed you. You are dead.')
+    $('#next').html('play again?')
+  }
+}
+function winCheck(){
+  if(enemy.hp < 1){
+    update(enemy.name + '\'s head explodes.')
+    $('#enemyName').fadeOut(4000)
+    $('#enemyHP').fadeOut(4000)
+  }
+}
+
 // }
+
+
+
+
+
+
+
 
 function newLoc(){
     // checkLoc
