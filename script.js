@@ -159,7 +159,7 @@ var helpVictim0 = {
   funct: function(){
     var rolled = roll()
     console.log('victimRoll = ' + rolled)
-    if(rolled > 100){
+    if(rolled > 50){
       var dmg = randNum(5,15)
       enemy.hp -= dmg
       showHP()

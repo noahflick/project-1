@@ -14,12 +14,12 @@ $('#displayMessage').hide()
 
 function focusText(){//hide ui elements
   $('#bottom').hide()
-  $('#status').hide()
+  $('#status').fadeOut(200)
 }
 
 function unfocusText(){
   $('#bottom').fadeIn(1000)
-  $('#status').fadeIn(1000)
+  $('#status').fadeIn(500)
 }
 
 focusText()
@@ -33,7 +33,8 @@ var hero = {
   bitten: false
 }
 
-$('#whole').fadeIn(3000)
+$('#whole').fadeIn(2000)
+$('#status').hide()
 
 // //intro
 var introText = "It is a lovely day in Downtown LA. However, you broke your App and decide to go to lunch."
@@ -57,7 +58,12 @@ var hall = {
   actions: 'check Akido Lab'
 }
 
-var locat = class3
+var downtown = {
+  name: 'Downtown',
+  img: 'assets/downtown.jpg',
+}
+
+var locat = downtown
 
 function showLocation() {$('#displayBox').css('background-image', 'url(' + locat.img + ')')
 }
@@ -165,21 +171,38 @@ function enemyHit(num){
 }
   //   action functions and results
 
-var attackText = [
+function attackText (){
+ var currentAttack = [
   'You punch ' + enemy.name + ' in the mouth. this causes ' + randFriend().name + ' to scream in horror!',
   'You take a swing at ' + enemy.name + ', but you miss and ' + enemy.name + ' charges at you. Luckily ' + randFriend().name + ' quickly finishes a git commit and kicks ' + enemy.name + '!',
   'You go to punch ' + enemy.name + ', but you miss. ' + enemy.name + ' groans and claws at ' + randFriend().name + ', who smashes a MacBook Air over ' + enemy.name + '\'s already rotting head.'
   ]
 
+  return currentAttack[randNum(0, currentAttack.length-1)]
+}
+
 var attack = {
+  tag: 'attack1',
   name: 'attack ' + enemy.name,
-  text: attackText[randNum(0, attackText.length-1)],
+  text: attackText(),
   func: function(){
     var dmg = randNum(5,15)
     enemy.hp -= dmg
     posFeedback('hit ' + enemy.name)
     subFeedback(-dmg)
+    updateStatus()
+    unfocusText()
+    $('#next').fadeOut(400)
+    randFriend()
+    attack.text = attackText()
+    document.getElementById('prompt').innerHTML += '<br/> What do you do?'
   },
+  pause: function(){
+    focusText()
+    $('#prompt').html(this.text)
+    $('#next').fadeIn(400)
+    nextHandler = function(){attack.func(); loseCheck(); winCheck()}
+  }
 }
 
 // select bite version (hit, fail, or miss)
@@ -233,6 +256,7 @@ var bite = biteVersions[biteRoll()]
 //Help Versions
 
 var helpSucceed = {
+  tag: 'help',
   name: 'Help ' + victims[0].name,
   text: 'You pull ' + enemy.name + ' away from ' + victims[0].name + '. ' + enemy.name + ' hisses at you, falling back over the comfy chair',
   func: function(){
@@ -240,17 +264,30 @@ var helpSucceed = {
     enemy.hp -= dmg
     posFeedback(enemy.name + ' falls down!')
     subFeedback(-dmg)
-    saved.push(victims[0].splice(0,1))
+    updateStatus()
+    unfocusText()
+    $('#help').remove()
+    $('#next').fadeOut(400)
+    document.getElementById('prompt').innerHTML += '<br/> What do you do?'
+    saved.push(victims[0])
+    victims.pop()
     helpVictim = helpVersions[randNum(0,1)]
   }
 }
 
 var helpFail = {
+  tag: 'help',
   name: 'Help ' + victims[0].name,
   text: 'You try to rescue ' + victims[0].name + ', but ' + enemy.name + ' flails wildly, throwing you and ' + randFriend().name + ' back. You watch helplessly as ' + enemy.name + ' kills '+victims[0].name+'.',
   func: function(){
     negFeedback(victims[0].name +' is Dead!')
     subFeedback('Noooooooo!!!!')
+    updateStatus()
+    $('#help').remove()
+    unfocusText()
+    $('#next').fadeOut(400)
+    randFriend()
+    document.getElementById('prompt').innerHTML += '<br/> What do you do?'
     killed.push(victims.splice(0,1))
   }
 }
@@ -259,24 +296,38 @@ var helpVersions = [
   helpFail
 ]
 var helpVictim = helpVersions[randNum(0,1)]
-
+  helpVictim.pause = function(){
+    focusText()
+    $('#prompt').html(this.text)
+    $('#next').fadeIn(400)
+    nextHandler = function(){helpVictim.func(); loseCheck(); winCheck()}
+   }
 
   //   win condition functions and results
+
 function loseCheck(){
   if(hero.hp < 1){
-    introUpdate(enemy.name + ' has Killed you. You are dead.')
+    focusText()
+    $('#prompt').html(enemy.name + ' has Killed you. You are dead.')
+    setTimeout(function(){$('#next').fadeIn(400)}, 2000)
     $('#next').html('play again?')
+    nextHandler = function(){location.reload()}
   }
 }
 function winCheck(){
   if(enemy.hp < 1){
-    update(enemy.name + '\'s head explodes.')
+    focusText()
+    $('#prompt').html(enemy.name + '\'s head explodes. you and ' + randFriend().name + ' high five and go get some coffee.')
     $('#enemyName').fadeOut(4000)
     $('#enemyHP').fadeOut(4000)
+    setTimeout(function(){$('#next').fadeIn(400)}, 2000)
+    $('#next').html('play again?')
+    nextHandler = function(){location.reload()}
   }
 }
 
 function updateStatus(){
+  $('#heroName').html(hero.name)
   $('#hp').html('HP: ' + hero.hp)
   $('#enemyHP').html('HP: ' + enemy.hp)
   $('#enemyName').html(enemy.name).css('color', 'red')
@@ -288,35 +339,76 @@ var curActions = [
   helpVictim
 ]
 
-function actionHandler(action) {
+function actionHandler() {
   focusText()
-  $('#prompt').html(action.text)
+  $('#prompt').html(action.text) //want this to fire when click either action  button.
   nextHandler = function(){
     action.func()
+    console.log('in nextHandler')
     updateStatus()
     unfocusText()
   }
 }
 
+function newActionHandler(action) {
+    action.func()
+    console.log('in newActionHandler')
+    updateStatus()
+    unfocusText()
+
+}
+
 function drawActions(){
   $('#input').empty()
   for (var i = 0; i < curActions.length; i++) {
-    $("<div>" + curActions[i].name + "</div>").appendTo('#input').removeClass().addClass('select').show()
+    $("<div id='" + curActions[i].tag + "'>" + curActions[i].name + "</div>").appendTo('#input').removeClass().addClass('select').show()
     $('#next').hide()
-    $(this).on('click', actionHandler(curActions[i]))
   }
+  $('#attack1').on('click', function(){
+    attack.pause()
+  })
+  $('#help').on('click', function(){
+    helpVictim.pause()
+  })
+
 }
 
   // on continue button click:
 function initBattle(){
+  locat = class3
+  showLocation()
   updateStatus()
-  setTimeout(drawActions(), 100)
+  drawActions()
+  buttonStyle()
   $('#bottom').fadeIn(2000)
   $('#input').fadeIn(2000)
   $('#status').fadeIn(2000)
   if(locat == class3)
     $('#rollcall').hide()
+  $('#prompt').html(battle1Text + '<br/> What do you do?')
 }
+
+var randFriend1 = randFriend()
+var battle1Text = "After a frustrating morning, you return from lunch and attempt to fix some bugs.... just as " + randFriend1.name + " starts to explain the finer points of " + randFriend1.specialty + ", " + zoms[0].name + " appears looking very sickly and awkwardly ambles into the room. Out of nowhere, " + zoms[0].name + " starts clawing and biting at " + victims[0].name + "."
+
+function buttonStyle(){$('.select').click(function() {
+    $(this).addClass('clicked')
+  }).mouseleave(function() {
+    $(this).removeClass('clicked')
+  });
+}
+
+var attackClick = function(){
+    var dmg = randNum(5,15)
+    enemy.hp -= dmg
+    posFeedback('hit ' + enemy.name)
+    subFeedback(-dmg)
+    return 'something'
+  }
+//var attackHandler
+
+
+
 // hide rollcall for initial battle
 
 

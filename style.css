@@ -101,11 +101,13 @@ h1, h2, h3, h4 {
 .attack {
   font-size: 50px;
   color: green;
+  margin: 0 auto;
 }
 
 .effect {
   font-size: 50px;
   color: red;
+  margin: 0 auto;
 }
 
 .damage {
@@ -133,6 +135,23 @@ h1, h2, h3, h4 {
 
 #next {
   width: 20%;
+  font-size: 15pt;
+  margin: 0 auto;
+
+}
+
+#prompt {
+  text-align: center;
+}
+
+#mid button {
+  text-align: center;
+}
+
+#icon {
+  height: 150px;
+  width: 150px;
+  background-image: url('https://avatars.slack-edge.com/2016-03-12/26452869974_2a95eb070b32e45bbf84_512.png');
 }
 
 
