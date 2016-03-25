@@ -1,5 +1,4 @@
-
-
+// define functions
 function randNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -8,15 +7,83 @@ function roll() {
   return randNum(0, 100)
 }
 
-$('#top').hide()
-$('#bottom').hide()
+//hide feedback texts
+$('.attack').hide()
+$('.effect').hide()
+$('#displayMessage').hide()
 
-
-var hero = {
-  name: prompt("Welcome to the Apocalypse. What is your name?"),
-  hp: 100,
+function focusText(){//hide ui elements
+  $('#bottom').hide()
+  $('#status').fadeOut(200)
 }
 
+function unfocusText(){
+  $('#bottom').fadeIn(1000)
+  $('#status').fadeIn(500)
+}
+
+focusText()
+
+$('#whole').hide()
+
+// choose name
+var hero = {
+  name: prompt("What is your name?"),
+  hp: 100,
+  bitten: false
+}
+
+$('#whole').fadeIn(2000)
+$('#status').hide()
+
+// //intro
+var introText = "It is a lovely day in Downtown LA. However, you broke your App and decide to go to lunch."
+
+// show intro text and location
+var class3 = {
+  name: 'Classroom 3',
+  img: 'assets/class3.jpg',
+  actions: 'checkBackpack'
+}
+
+var lounge = {
+  name: 'Lounge',
+  img: 'assets/lounge.jpg',
+  actions: 'checkClassroom1'
+}
+
+var hall = {
+  name: 'Hallway',
+  img: 'assets/hall.jpg',
+  actions: 'check Akido Lab'
+}
+
+var downtown = {
+  name: 'Downtown',
+  img: 'assets/downtown.jpg',
+}
+
+var locat = downtown
+
+function showLocation() {$('#displayBox').css('background-image', 'url(' + locat.img + ')')
+}
+
+showLocation()
+
+$('#prompt').html(introText)
+
+// make continue button event handler
+var nextHandler
+$('#next').on('click', function(){
+  nextHandler()
+})
+
+nextHandler = initBattle
+
+
+//vars:
+//  hero - done
+  //   location/actions
 var friends = [
   {name: 'Kedar', gender: 'm', equip: 'marker', specialty: 'basketball'},
   {name: 'Hannah', gender: 'f', equip: 'ruby book', specialty: 'political conversation'},
@@ -39,53 +106,30 @@ var friends = [
   {name: 'JoBeth', gender: 'f', equip: 'colorful MacBook', specialty: 'Filipino culture'}
 //machete, axe, chainsaw, nunchuk, crowbar,
 ]
-
-for (var i = 0; i < friends.length; i++) { //depend: friends, hero
+  //   friends
+  function randFriend() {
+ return friends[randNum(0, friends.length-1)]
+}
+var saved = []
+  //remove hero from friends array
+for (var i = 0; i < friends.length; i++) {
   if (friends[i].name.toLowerCase() === hero.name.toLowerCase()){
     console.log('You are ' + friends[i].name); friends.splice(i, 1);
   }
 }
-
-var zoms = friends.splice(randNum(0, friends.length-1), 1) //initial zom, add'l zoms will be added.
-console.log(friends.length + ' friends remain. ', zoms.length, zoms.length == 1 ? 'is a zombie.' : 'are zombies.')
-
-var turn = 1
-var enemy = zoms[turn-1]
+//  choose zoms/enemy
+var zoms = friends.splice(randNum(0, friends.length-1), 1)
+var enemy = zoms[zoms.length-1]
 enemy.name = 'Zombie ' + enemy.name
 enemy.hp = 30
-enemy.actions = {}
-enemy.actions.bite = {
-  name : 'bite',
-  funct : function(){
-    var rolled = roll()
-    console.log(enemy.name + ' rolled ' + rolled)
-    if(rolled > 90){
-      hero.turned = true
-      update('you have been bitten by ' + enemy.name + '. You have moments before you will turn into a zombie.')
-    } else if (rolled < 30){
-      hero.hp -= 10
-      update(enemy.name + 'bites at you. you aren\'t bitten but stumble over ' + randFriend().name + ' and hurt yourself.' )
-      $('.attack').toggle(50).html('You stumble over')
-        setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
-        setTimeout(function(){$('.effect').toggle(500).html(-10 + 'hp!')}, 1000)
-        setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
-      showHP()
-    } else {
-      update(enemy.name + ' lunges, trying to bite you, but ' + randFriend().name + ' throws a chair at ' + enemy.name)
-      $('.attack').toggle(50).html('Chair hits ' + enemy.name)
-      setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
-      setTimeout(function(){$('.effect').toggle(500).html(-10 + 'hp!')}, 1000)
-      setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
-      enemy.hp -= 10
-      showHP()
-    }
-  }
-}
-enemy.actions.claw = function(){}
-enemy.actions.grab = function(){}
 
+//   victims
 var victims = friends.splice(randNum(0, friends.length-1), 1)
+victim = victims[0]
 
+var killed = []
+
+//   roll call
 function survivors(){
   var list = ""
   for (var i = 0; i < friends.length; i++) {
@@ -101,189 +145,252 @@ function zombies(){
   }
   return list
 }
+  //define feedbacks/ effects
+function posFeedback(text){
+  $('.attack').css('color', 'green')
+  $('.attack').toggle(50).html(text)
+  setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
+}
+function negFeedback(text){
+  $('.attack').css('color', 'red')
+  $('.attack').toggle(50).html(text)
+  setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
+}
 
-console.log(friends.length + ' friends remain. ', victims.length, victims.length == 1 ? 'is under attack.' : 'are under attack.')
+function subFeedback(text){
+  setTimeout(function(){$('.effect').toggle(500).html(text)}, 1000)
+  setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
+}
 
-//Define Character Actions====
+function playerHit(num){
+  hero.hp =- num
+}
 
-var defaultActions = [
-  {name: 'attack ' + enemy.name,
-    funct: function(){
-      var dmg = randNum(5,15)
-      enemy.hp -= dmg
-      $('.attack').toggle(50).html('hit ' + enemy.name)
-      setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
-      setTimeout(function(){$('.effect').toggle(500).html(-dmg + 'hp!')}, 1000)
-      setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
-      update(attackText[randNum(0,attackText.length-1)])
-      showHP()
-    }
+function enemyHit(num){
+  enemy.hp =- num
+}
+  //   action functions and results
+
+function attackText (){
+ var currentAttack = [
+  'You punch ' + enemy.name + ' in the mouth. this causes ' + randFriend().name + ' to scream in horror!',
+  'You take a swing at ' + enemy.name + ', but you miss and ' + enemy.name + ' charges at you. Luckily ' + randFriend().name + ' quickly finishes a git commit and kicks ' + enemy.name + '!',
+  'You go to punch ' + enemy.name + ', but you miss. ' + enemy.name + ' groans and claws at ' + randFriend().name + ', who smashes a MacBook Air over ' + enemy.name + '\'s already rotting head.'
+  ]
+
+  return currentAttack[randNum(0, currentAttack.length-1)]
+}
+
+var attack = {
+  tag: 'attack1',
+  name: 'attack ' + enemy.name,
+  text: attackText(),
+  func: function(){
+    var dmg = randNum(5,15)
+    enemy.hp -= dmg
+    posFeedback('hit ' + enemy.name)
+    subFeedback(-dmg)
+    updateStatus()
+    unfocusText()
+    $('#next').fadeOut(400)
+    randFriend()
+    attack.text = attackText()
+    document.getElementById('prompt').innerHTML += '<br/> What do you do?'
   },
-  // {name: 'kick ' + enemy.name,
-  //   funct: function(){
-  //     $('.attack').toggle(50).html('kicked ' + enemy.name)
-  //     setTimeout(function(){$('.attack').fadeOut(1000)}, 1000)
-  //     console.log('kicked!!')
-  //   }
-  // }
-]
-
-$('.attack').hide()
-$('.effect').hide()
-$('#displayMessage').hide()
-
-
-//Define Location specific action objects===
-var runToLounge = {
-  name: 'Run to Lounge',
-  funct: function(){
-    console.log('Ran to Lounge!')
-  }
-}
-var runToHall = {
-  name: 'Run to Hallway',
-  funct: function(){
-    console.log('Ran to Hallway!')
+  pause: function(){
+    focusText()
+    $('#prompt').html(this.text)
+    $('#next').fadeIn(400)
+    nextHandler = function(){attack.func(); loseCheck(); winCheck()}
   }
 }
 
-var runToElevator = {
-  name: 'Run to Hallway',
-  funct: function(){
-    console.log('Ran to Hallway!')
+// select bite version (hit, fail, or miss)
+function biteRoll(){
+  rolled = roll()
+  if(rolled > 90)
+    return 0
+  else if (rolled < 30)
+    return 1
+  else
+    return 2
+}
+
+var biteHit = {
+  name: 'bite',
+  text: 'you have been bitten by ' + enemy.name + '. You have moments before you will turn into a zombie.',
+  func: function(){
+    var dmg = randNum(5,15)
+    hero.hp -= dmg
+    negFeedback(enemy.name + 'bites you!')
+    subFeedback(-dmg)
+    bite = biteVersions[biteRoll()]
   }
 }
 
-var helpVictim0 = {
+var biteFail = {
+  name: 'bite',
+  text: enemy.name + 'bites at you. you aren\'t bitten but stumble over ' + randFriend().name + ' and hurt yourself.',
+  func: function(){
+    var dmg = randNum(5,15)
+    hero.hp -= dmg
+    negFeedback('You Stumble')
+    subFeedback(-dmg)
+    bite = biteVersions[biteRoll()]
+  }
+}
+
+var biteMiss = {
+  name: 'bite',
+  text: enemy.name + ' lunges, trying to bite you, but ' + randFriend().name + ' throws a chair at ' + enemy.name,
+  func: function(){
+      posFeedback(enemy.name + ' misses.')
+      subFeedback('You got lucky!')
+      bite = biteVersions[biteRoll()]
+  }
+}
+
+var biteVersions = [biteHit, biteFail, biteMiss]
+var bite = biteVersions[biteRoll()]
+
+//Help Versions
+
+var helpSucceed = {
+  tag: 'help',
   name: 'Help ' + victims[0].name,
-  funct: function(){
-    var rolled = roll()
-    console.log('victimRoll = ' + rolled)
-    if(rolled > 50){
-      var dmg = randNum(5,15)
-      enemy.hp -= dmg
-      showHP()
-      $('.attack').toggle(50).html(enemy.name +' stumbles!')
-      setTimeout(function(){$('.attack').fadeOut(1000)}, 3000)
-      setTimeout(function(){$('.effect').toggle(500).html(-dmg + 'hp!')}, 1000)
-      setTimeout(function(){$('.effect').fadeOut(1000)}, 3000)
-      update(victim0Text[randNum(0,victim0Text.length-1)])
-      curLocation.actions = curLocation.actions.filter(function (action) { return action.name != 'Help ' + victims[0].name});
-      curActions()
-      victimSaved = true
-    } else {
-      update('You try to rescue ' + victims[0].name + ', but ' + enemy.name + ' flails wildly, throwing you and ' + randFriend().name + ' back. You watch helplessly as ' + enemy.name + ' kills '+victims[0].name+'.')
-      $('.attack').toggle(50).html(victims[0].name +' is Dead!')
-      setTimeout(function(){$('.attack').fadeOut(1000)}, 5000)
-      curLocation.actions = curLocation.actions.filter(function (action) { return action.name != 'Help ' + victims[0].name});
-      curActions()
-      console.log('victims = ' + victims)
-      victims.pop()
-      console.log('victims = '+victims)
-    }
+  text: 'You pull ' + enemy.name + ' away from ' + victims[0].name + '. ' + enemy.name + ' hisses at you, falling back over the comfy chair',
+  func: function(){
+    var dmg = randNum(5,15)
+    enemy.hp -= dmg
+    posFeedback(enemy.name + ' falls down!')
+    subFeedback(-dmg)
+    updateStatus()
+    unfocusText()
+    $('#help').remove()
+    $('#next').fadeOut(400)
+    document.getElementById('prompt').innerHTML += '<br/> What do you do?'
+    saved.push(victims[0])
+    victims.pop()
+    helpVictim = helpVersions[randNum(0,1)]
   }
 }
 
-var lookInClass1 = {
-  name: 'Look in Classroom 1 ',
-  funct: function(){
-    console.log('Looked in Classroom 1')
+var helpFail = {
+  tag: 'help',
+  name: 'Help ' + victims[0].name,
+  text: 'You try to rescue ' + victims[0].name + ', but ' + enemy.name + ' flails wildly, throwing you and ' + randFriend().name + ' back. You watch helplessly as ' + enemy.name + ' kills '+victims[0].name+'.',
+  func: function(){
+    negFeedback(victims[0].name +' is Dead!')
+    subFeedback('Noooooooo!!!!')
+    updateStatus()
+    $('#help').remove()
+    unfocusText()
+    $('#next').fadeOut(400)
+    randFriend()
+    document.getElementById('prompt').innerHTML += '<br/> What do you do?'
+    killed.push(victims.splice(0,1))
+  }
+}
+var helpVersions = [
+  helpSucceed,
+  helpFail
+]
+var helpVictim = helpVersions[randNum(0,1)]
+  helpVictim.pause = function(){
+    focusText()
+    $('#prompt').html(this.text)
+    $('#next').fadeIn(400)
+    nextHandler = function(){helpVictim.func(); loseCheck(); winCheck()}
+   }
+
+  //   win condition functions and results
+
+function loseCheck(){
+  if(hero.hp < 1){
+    focusText()
+    $('#prompt').html(enemy.name + ' has Killed you. You are dead.')
+    setTimeout(function(){$('#next').fadeIn(400)}, 2000)
+    $('#next').html('play again?')
+    nextHandler = function(){location.reload()}
+  }
+}
+function winCheck(){
+  if(enemy.hp < 1){
+    focusText()
+    $('#mid').css('height', '200px')
+    $('#prompt').html(enemy.name + '\'s head explodes. <h2 class="attack">You Win!</h2>')
+    $('#enemyName').fadeOut(4000)
+    $('#enemyHP').fadeOut(4000)
+    setTimeout(function(){$('#next').fadeIn(400)}, 2000)
+    $('#next').html('play again?')
+    nextHandler = function(){location.reload()}
   }
 }
 
-function update(text){
-  $('#prompt').html(text + '<br/> Now what do you want to do?')
-  $('#next').hide()
-}
-function introUpdate(text){
-  $('#playscreen').hide()
-  $('#top').show()
-  $('#displayBox').show()
-  showLocation
-  $('#status').hide()
-  $('#textUpdate').html(text)
-  $('#textUpdate').append($('#next'))
-  $('#next').show()
-  curHandler = initScreen
-
-}
-
-var curHandler;
-
-$('#next').on('click', function(){
-  curHandler()
-})
-
-var randFriend1 = randFriend()
-var introText = "After a frustrating morning, you return from lunch and attempt to fix some bugs.... just as " + randFriend1.name + " starts to explain the finer points of  \"" + randFriend1.specialty + "\", " + zoms[0].name + " appears looking very sickly and awkwardly ambles into the room. Out of nowhere, " + zoms[0].name + " bites " + victims[0].name + " on the neck. "
-function introScene(){
-  $('#prompt').show()
-  introUpdate(introText)
-
-}
-
-function Location(name, img, actions){//location constructor
-  this.name = name
-  this.img = img
-  this.actions = actions
-}//Hannah: make a location index object with keys
-
-var class3 = new Location(
-  'Classroom 3',
-  'assets/class3.jpg',
-  [/*runToLounge, runToHall, */helpVictim0]
-)
-var lounge = new Location(
-  'GA Lounge',
-  'assets/lounge.jpg',
-  [/*lookInClass1, runToHall*/]
-)
-
-var curLocation = lounge//current location. locations should have a forward and backward linked location.
-
-function curActions(){
-  $('#input').empty()
-  for (var i = 0; i < defaultActions.length; i++) {
-      $("<div>" + defaultActions[i].name + "</div>").appendTo('#input').on('click', defaultActions[i].funct).removeClass().addClass('select')
-  }
-  for (var i = 0; i < curLocation.actions.length; i++) {
-    $("<div>" + curLocation.actions[i].name + "</div>").appendTo('#input').on('click', curLocation.actions[i].funct).removeClass().addClass('select')
-  }
-  $('#input div').on('click', function(){
-    loseCheck()
-    winCheck()
-  })
-}
-
-function rollCall(){
-  $('#survivors').html(survivors())
-  $('#zombies').html(zombies())
-}
-$('#heroName').html(hero.name)
-
-function showLocation() {$('#displayBox').css('background-image', 'url(' + curLocation.img + ')')
-}
-function showHP(){
+function updateStatus(){
+  $('#heroName').html(hero.name)
   $('#hp').html('HP: ' + hero.hp)
   $('#enemyHP').html('HP: ' + enemy.hp)
   $('#enemyName').html(enemy.name).css('color', 'red')
 }
 
-function initScreen(){
-  $('#playscreen').show()
-  $('#prompt').html(introText)
-  $('#top, #bottom, #status').show()
-  showLocation()
-  showHP()
-  curActions()
-  rollCall()
-  $('#next').hide()
-  $('#textUpdate').hide()
+
+var curActions = [
+  attack,
+  helpVictim
+]
+
+function actionHandler() {
+  focusText()
+  $('#prompt').html(action.text) //want this to fire when click either action  button.
+  nextHandler = function(){
+    action.func()
+    console.log('in nextHandler')
+    updateStatus()
+    unfocusText()
+  }
 }
 
+function newActionHandler(action) {
+    action.func()
+    console.log('in newActionHandler')
+    updateStatus()
+    unfocusText()
 
+}
 
-// initScreen()
+function drawActions(){
+  $('#input').empty()
+  for (var i = 0; i < curActions.length; i++) {
+    $("<div id='" + curActions[i].tag + "'>" + curActions[i].name + "</div>").appendTo('#input').removeClass().addClass('select').show()
+    $('#next').hide()
+  }
+  $('#attack1').on('click', function(){
+    attack.pause()
+  })
+  $('#help').on('click', function(){
+    helpVictim.pause()
+  })
+
+}
+
+  // on continue button click:
+function initBattle(){
+  locat = class3
+  showLocation()
+  updateStatus()
+  drawActions()
+  buttonStyle()
+  $('#bottom').fadeIn(2000)
+  $('#input').fadeIn(2000)
+  $('#status').fadeIn(2000)
+  if(locat == class3)
+    $('#rollcall').hide()
+  $('#prompt').html(battle1Text + '<br/> What do you do?')
+}
+
+var randFriend1 = randFriend()
+var battle1Text = "After a frustrating morning, you return from lunch and attempt to fix some bugs.... just as " + randFriend1.name + " starts to explain the finer points of " + randFriend1.specialty + ", " + zoms[0].name + " appears looking very sickly and awkwardly ambles into the room. Out of nowhere, " + zoms[0].name + " starts clawing and biting at " + victims[0].name + "."
 
 function buttonStyle(){$('.select').click(function() {
     $(this).addClass('clicked')
@@ -291,76 +398,83 @@ function buttonStyle(){$('.select').click(function() {
     $(this).removeClass('clicked')
   });
 }
-buttonStyle()
 
-var attackText = [
-  'You punch ' + enemy.name + ' in the mouth. this causes ' + randFriend().name + ' to scream in horror!',
-  'You take a swing at ' + enemy.name + ', but you miss and ' + enemy.name + ' charges at you. Luckily ' + randFriend().name + ' quickly finishes a git commit and kicks ' + enemy.name + '!',
-  'You go to punch ' + enemy.name + ', but you miss. ' + enemy.name + ' groans and claws at ' + randFriend().name + ', who smashes a MacBook Air over ' + enemy.name + '\'s already rotting head.'
-  ]
-
-var victim0Text = [
-    'You tear ' + victims[victims.length-1].name + ' away from ' + enemy.name + '. ' + victims[victims.length-1].name + ' kicks ' + enemy.name + ', who stumbles into the wall erasing ' + randFriend().name + '\'s complicated recursion diagram.',
-    'As you pull ' + enemy.name + ' off of ' + victims[victims.length-1].name + ', ' + randFriend().name + ' throws a backpack across the room, sending ' + enemy.name + ' stumbling over the lectern.'
-]
-
-function randFriend() {
- return friends[randNum(0, friends.length-1)]
-}
-
-introScene()
-
-function loseCheck(){
-  if(hero.hp < 1){
-    introUpdate(enemy.name + ' has Killed you. You are dead.')
-    $('#next').html('play again?')
+var attackClick = function(){
+    var dmg = randNum(5,15)
+    enemy.hp -= dmg
+    posFeedback('hit ' + enemy.name)
+    subFeedback(-dmg)
+    return 'something'
   }
-}
-function winCheck(){
-  if(enemy.hp < 1){
-    update(enemy.name + '\'s head explodes.')
-    $('#enemyName').fadeOut(4000)
-    $('#enemyHP').fadeOut(4000)
-  }
-}
-
-// }
+//var attackHandler
 
 
 
+// hide rollcall for initial battle
+
+
+
+//start round 1
+  // checks: hero, location, enemy, rollcall, special.
+  // draw actions, status, rollcall, location, text
+
+
+// player turn:
+  // update text box with action prompt.
+  // player chooses action (click):
+  //   action happens:
+  //     display text, w next button
+  //     on click, calc dmg, etc.
+  //     display hit feedback
+  //     update status
+  //     check for loss, check for win
+  // enemy chooses ( display enemy "prompt")
+  //   action happens:
+  //     disply text, w next button
+  //     on click, calc dmg, etc.
+  //     display hit feedback
+  //     update status
+  //     check for loss, check for win
+  //     loop-->player turn
+
+// if lose:
+//   update loss text with animation
+//   button to play again
+
+// if win: check for victim var
+//     display victim text (either win or lose)
+//    update win text, with location button
+//
+//    on click:
+
+// start next round/location:
+  //checks: hero, location, enemy, rollcall, special.
+  //draw actions, status, rollcall, location, text
+
+  //etc.
+
+  //boss fight with grant -??
+
+//final location: after win:
+  //display final win text. summary button
+
+  //summary button clicked:
+    //display final game stats. "play again" button
 
 
 
 
 
-function newLoc(){
-    // checkLoc
-    // checkHero
-    // pickEnemy?
-    // pickVictim?
-    // rollCall()
-    // initScreen(loc actions)
-    // textintro
-    //  choice- escape to next location or fight?
-    // rollcall again
-    // loop{
-    //   playerturn
-    //     prompt
-    //     actions
-    //     summary/result
-    //     check win/lose
-    //   enemyturn
-    //     update/result
-    //     check win/lose
-    // }
-    // lose exit
-    // win -> draw choose next location
-    // next location generates battle
 
-}
 
-/*function changeLoc(){
-  $('#displayBox').css("background-image", "url('http://s3-media4.fl.yelpcdn.com/bphoto/_plEFiI6ph2EEdI3Z02ypA/o.jpg')")
-}*/
+
+
+
+
+
+
+
+
+
 
 
