@@ -317,7 +317,8 @@ function loseCheck(){
 function winCheck(){
   if(enemy.hp < 1){
     focusText()
-    $('#prompt').html(enemy.name + '\'s head explodes. you and ' + randFriend().name + ' high five and go get some coffee.')
+    $('#mid').css('height', '200px')
+    $('#prompt').html(enemy.name + '\'s head explodes. <h2 class="attack">You Win!</h2>')
     $('#enemyName').fadeOut(4000)
     $('#enemyHP').fadeOut(4000)
     setTimeout(function(){$('#next').fadeIn(400)}, 2000)
