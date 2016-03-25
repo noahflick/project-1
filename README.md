@@ -1,4 +1,4 @@
-# project-1
+coding.dead
 
 Description of "coding.dead":
 coding.dead is a turn-based rpg, named "coding.dead" played in the browser.
