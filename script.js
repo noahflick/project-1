@@ -192,6 +192,7 @@ var attack = {
     subFeedback(-dmg)
     updateStatus()
     unfocusText()
+    $('#bottom').hide()
     $('#next').fadeOut(400)
     randFriend()
     attack.text = attackText()
@@ -201,14 +202,14 @@ var attack = {
     focusText()
     $('#prompt').html(this.text)
     $('#next').fadeIn(400)
-    nextHandler = function(){attack.func(); loseCheck(); winCheck()}
+    nextHandler = function(){attack.func(); $('#prompt').empty();loseCheck(); winCheck(); zomTurn()}
   }
 }
 
 // select bite version (hit, fail, or miss)
 function biteRoll(){
   rolled = roll()
-  if(rolled > 90)
+  if(rolled > 60)
     return 0
   else if (rolled < 30)
     return 1
@@ -266,6 +267,7 @@ var helpSucceed = {
     subFeedback(-dmg)
     updateStatus()
     unfocusText()
+    $('#bottom').hide()
     $('#help').remove()
     $('#next').fadeOut(400)
     document.getElementById('prompt').innerHTML += '<br/> What do you do?'
@@ -285,6 +287,7 @@ var helpFail = {
     updateStatus()
     $('#help').remove()
     unfocusText()
+    $('#bottom').hide()
     $('#next').fadeOut(400)
     randFriend()
     document.getElementById('prompt').innerHTML += '<br/> What do you do?'
@@ -300,7 +303,7 @@ var helpVictim = helpVersions[randNum(0,1)]
     focusText()
     $('#prompt').html(this.text)
     $('#next').fadeIn(400)
-    nextHandler = function(){helpVictim.func(); loseCheck(); winCheck()}
+    nextHandler = function(){helpVictim.func(); $('#prompt').empty();loseCheck(); winCheck(); zomTurn()}
    }
 
   //   win condition functions and results
@@ -308,7 +311,8 @@ var helpVictim = helpVersions[randNum(0,1)]
 function loseCheck(){
   if(hero.hp < 1){
     focusText()
-    $('#prompt').html(enemy.name + ' has Killed you. You are dead.')
+    $('#mid').css('height', '200px')
+    $('#prompt').html(enemy.name + ' has Killed you.' + '<h1 class="attack">You Died</h1>')
     setTimeout(function(){$('#next').fadeIn(400)}, 2000)
     $('#next').html('play again?')
     nextHandler = function(){location.reload()}
@@ -407,7 +411,28 @@ var attackClick = function(){
     return 'something'
   }
 //var attackHandler
+function zomTurn(){
+  setTimeout(function(){
+    $('#bottom').fadeOut(300);
+    $('#next').fadeIn(300);
+    $('#prompt').html(enemy.name + ' sways dizzily around for a moment, then rushes toward you.')
+  }, 2000)
+  nextHandler = function(){
+    nextHandler = function(){
+      unfocusText()
+      $('#next').fadeOut(300)
+    }
+    bite.func()
+    updateStatus()
+    unfocusText()
+    $('#bottom').hide()
+    $('#prompt').html(bite.text)
+    loseCheck(); winCheck();
+  }
 
+
+
+}
 
 
 // hide rollcall for initial battle
