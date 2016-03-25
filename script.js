@@ -29,7 +29,7 @@ $('#whole').hide()
 // choose name
 var hero = {
   name: prompt("What is your name?"),
-  hp: 100,
+  hp: 30,
   bitten: false
 }
 
@@ -318,7 +318,7 @@ function winCheck(){
   if(enemy.hp < 1){
     focusText()
     $('#mid').css('height', '200px')
-    $('#prompt').html(enemy.name + '\'s head explodes. <h2 class="attack">You Win!</h2>')
+    $('#prompt').html(enemy.name + ' lets out a shriek and dies. <h2 class="attack">You Win!</h2>')
     $('#enemyName').fadeOut(4000)
     $('#enemyHP').fadeOut(4000)
     setTimeout(function(){$('#next').fadeIn(400)}, 2000)
